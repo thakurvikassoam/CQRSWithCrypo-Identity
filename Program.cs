@@ -92,27 +92,27 @@ app.MapGet("/Users/{id:guid}", async (ILogger<Program> logger,  Guid id, ISender
     if (product == null) return Results.NotFound();   
     return Results.Ok(product);
 })
-.RequireAuthorization().WithHttpLogging(HttpLoggingFields.ResponsePropertiesAndHeaders); ;
+.RequireAuthorization().WithHttpLogging(HttpLoggingFields.All); ;
 
 app.MapGet("/Users", async (ISender mediatr) =>
 {
     var products = await mediatr.Send(new UserListQuery());    
     return Results.Ok(products);
-}).RequireAuthorization().WithHttpLogging(HttpLoggingFields.ResponsePropertiesAndHeaders); ;
+}).RequireAuthorization().WithHttpLogging(HttpLoggingFields.All); ;
 
 app.MapPost("/Users", async (CreateUserCommand command, ISender mediatr) =>
 {
     var productId = await mediatr.Send(command);
     if (Guid.Empty == productId) return Results.BadRequest();
     return Results.Created($"/Users/{productId}", new { id = productId });
-}).RequireAuthorization().WithHttpLogging(HttpLoggingFields.ResponsePropertiesAndHeaders); ;
+}).RequireAuthorization().WithHttpLogging(HttpLoggingFields.All); ;
 
 app.MapDelete("/Users/{id:guid}", async (Guid id, ISender mediatr) =>
 {
     await mediatr.Send(new DeleteUserCommand(id));
     return Results.NoContent();
-}).RequireAuthorization().WithHttpLogging(HttpLoggingFields.ResponsePropertiesAndHeaders); ;
+}).RequireAuthorization().WithHttpLogging(HttpLoggingFields.All);
 app.Logger.LogInformation("Starting the app");
 app.UseW3CLogging();
-//app.UseMiddleware<EncryptionMiddleware>();
+app.UseMiddleware<EncryptionMiddleware>();
 app.Run();
